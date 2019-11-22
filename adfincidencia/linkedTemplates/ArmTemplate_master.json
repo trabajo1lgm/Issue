@@ -1,0 +1,70 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adfincidencia"
+		},
+		"BlobExp_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'BlobExp'"
+		},
+		"blobike_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'blobike'"
+		},
+		"exp1_apiKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'apiKey' of 'exp1'"
+		},
+		"exp2_apiKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'apiKey' of 'exp2'"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"BlobExp_connectionString": {
+						"value": "[parameters('BlobExp_connectionString')]"
+					},
+					"blobike_connectionString": {
+						"value": "[parameters('blobike_connectionString')]"
+					},
+					"exp1_apiKey": {
+						"value": "[parameters('exp1_apiKey')]"
+					},
+					"exp2_apiKey": {
+						"value": "[parameters('exp2_apiKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

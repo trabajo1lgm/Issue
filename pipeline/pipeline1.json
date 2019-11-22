@@ -1,0 +1,116 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "ML Batch Execution1",
+				"type": "AzureMLBatchExecution",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"webServiceOutputs": {
+						"output1": {
+							"filePath": "entrenamiento/bike.ilearner",
+							"linkedServiceName": {
+								"referenceName": "blobike",
+								"type": "LinkedServiceReference"
+							}
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "exp1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ML Update Resource1",
+				"type": "AzureMLUpdateResource",
+				"dependsOn": [
+					{
+						"activity": "ML Batch Execution1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "exp2",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"trainedModelName": "bike",
+					"trainedModelLinkedServiceName": {
+						"referenceName": "blobike",
+						"type": "LinkedServiceReference"
+					},
+					"trainedModelFilePath": "entrenamiento/bike.ilearner"
+				}
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ML Batch Execution1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "bike",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "bikecopy",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
